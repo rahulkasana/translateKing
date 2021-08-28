@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
 import {LANGUAGES, NAMES} from '../constants';
 import Config from 'react-native-config';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -57,19 +58,21 @@ class TranslateKing extends Component {
     });
   };
 
-  copyToClipboard = () => {
-    Clipboard.setString('hello world');
+  copyToClipboard = isSourceText => () => {
+    const {sourceText, targetText} = this.state;
+    const text = isSourceText ? sourceText : targetText;
+    console.log(`clipboard copied ${text}`);
+    Clipboard.setString(`${text}`);
   };
 
   render() {
-    const {source, target, targetText} = this.state;
+    const {source, target, sourceText, targetText} = this.state;
     return (
       <>
-        <View
-          style={{padding: 16, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.headingContainer}>
           <Text style={styles.headingText}>TRANSLATE KING</Text>
         </View>
-        <View style={styles.headingContainer}>
+        <View style={styles.subHeadingContainer}>
           <TouchableOpacity
             activeOpacity={1}
             onPress={this.openSource}
@@ -82,7 +85,7 @@ class TranslateKing extends Component {
             onPress={this.toggleLang}
             style={{flexDirection: 'row', alignItems: 'center', width: '10%'}}>
             <Text>
-              <Icon name="swap" size={20} color="black" />
+              <Icon name="swap" size={20} color="#f66" />
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -99,15 +102,33 @@ class TranslateKing extends Component {
           </TouchableOpacity>
         </View>
         {/*<View>*/}
-        <TextInput
-          style={styles.inputBox}
-          multiline={true}
-          numberOfLines={4}
-          placeholder="Enter Input Text"
-          onChangeText={text => this.setState({sourceText: text})}
-          value={this.state.sourceText}
-          onEndEditing={this.translateText}
-        />
+        <View>
+          <TextInput
+            style={styles.inputBox}
+            multiline={true}
+            numberOfLines={4}
+            placeholder="Enter Input Text"
+            onChangeText={text => this.setState({sourceText: text})}
+            value={sourceText}
+            onEndEditing={this.translateText}
+          />
+          {sourceText.length > 0 && (
+            <Text
+              style={{
+                position: 'absolute',
+                zIndex: 100,
+                bottom: 20,
+                right: 20,
+              }}>
+              <Feather
+                onPress={this.copyToClipboard(true)}
+                name="copy"
+                size={20}
+                color="black"
+              />
+            </Text>
+          )}
+        </View>
         {targetText.length > 0 && (
           <>
             <View style={{paddingHorizontal: 16, paddingVertical: 8}}>
@@ -120,8 +141,13 @@ class TranslateKing extends Component {
               onChangeText={text => this.setState({targetText: text})}
               value={targetText}
             />
-            <Text>
-              <Icon name="swap" size={20} color="black" />
+            <Text style={{position: 'absolute', bottom: 20, right: 20}}>
+              <Feather
+                onPress={this.copyToClipboard(false)}
+                name="copy"
+                size={20}
+                color="black"
+              />
             </Text>
           </>
         )}
@@ -132,8 +158,14 @@ class TranslateKing extends Component {
 }
 
 const styles = StyleSheet.create({
-  headingText: {fontSize: 18},
+  headingText: {fontSize: 18, fontWeight: '600', color: 'white'},
   headingContainer: {
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f66',
+  },
+  subHeadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -142,9 +174,9 @@ const styles = StyleSheet.create({
   inputBox: {
     height: 100,
     margin: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'gray',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#f66',
     paddingHorizontal: 8,
     backgroundColor: 'white',
   },
